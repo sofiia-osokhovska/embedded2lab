@@ -1,0 +1,30 @@
+#define LDR_PIN 12      // GPIO12 - ADC
+#define LED_DAC 26      // GPIO26 - DAC
+
+int adcValue = 0;
+int dacValue = 0;
+
+void setup() {
+  Serial.begin(115200);
+}
+
+void loop() {
+  // Зчитування з фоторезистора
+  adcValue = analogRead(LDR_PIN);
+
+  // Масштабування 0–4095 -> 0–255
+  dacValue = adcValue / 16;
+
+  if (dacValue > 255) dacValue = 255;
+  if (dacValue < 0) dacValue = 0;
+
+  // Запис у ЦАП
+  dacWrite(LED_DAC, dacValue);
+
+  Serial.print("ADC: ");
+  Serial.print(adcValue);
+  Serial.print(" | DAC: ");
+  Serial.println(dacValue);
+
+  delay(500);
+}
