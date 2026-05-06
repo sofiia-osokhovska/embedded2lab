@@ -1,0 +1,61 @@
+          #include <OneWire.h>
+#include <DallasTemperature.h>
+#include <Wire.h>
+#include <Adafruit_BMP280.h>
+
+// DS18B20
+#define ONE_WIRE_BUS 4
+OneWire oneWire(ONE_WIRE_BUS);
+DallasTemperature tempSensor(&oneWire);
+
+// BMP280
+Adafruit_BMP280 bmp;
+
+// Фоторезистор
+#define LDR_PIN 34
+
+void setup() {
+  Serial.begin(115200);
+
+  // DS18B20
+  tempSensor.begin();
+
+  // BMP280
+  if (!bmp.begin(0x76)) { // іноді 0x77
+    Serial.println("BMP280 не знайдено!");
+    while (1);
+  }
+
+  Serial.println("Система запущена");
+}
+
+void loop() {
+
+  tempSensor.requestTemperatures();
+  float tempC = tempSensor.getTempCByIndex(0);
+
+  float pressure = bmp.readPressure() / 100.0F; // гПа
+  float tempBMP = bmp.readTemperature();
+
+  int light = analogRead(LDR_PIN);
+
+  // Вивід
+  Serial.println("----- Дані -----");
+
+  Serial.print("DS18B20 Температура: ");
+  Serial.print(tempC);
+  Serial.println(" °C");
+
+  Serial.print("BMP280 Температура: ");
+  Serial.print(tempBMP);
+  Serial.println(" °C");
+
+  Serial.print("Тиск: ");
+  Serial.print(pressure);
+  Serial.println(" hPa");
+
+  Serial.print("Освітленість (ADC): ");
+  Serial.println(light);
+
+  delay(2000);
+}
